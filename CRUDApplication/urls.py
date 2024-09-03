@@ -16,11 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from client.views import create_client, update_client, delete_client, get_all_clients, get_client_details_by_id
+from client.views import create_client, update_client, delete_client, get_all_clients, get_clients_by_lastname, get_client_details_by_id
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/clients', get_all_clients, name='get_all_clients'),
+    path('api/clients/search/<str:client_lastname>', get_clients_by_lastname, name='get_clients_by_lastname'),
     path('api/client/<int:client_id>', get_client_details_by_id, name='get_client_details_by_id'),
     path('api/client/create', create_client, name='create-client'),
     path('api/client/update/<int:client_id>', update_client, name='update-client'),

@@ -12,6 +12,13 @@ def get_all_clients(request):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
+def get_clients_by_lastname(request, client_lastname):
+    clients = Client.objects.filter(lastname__icontains=client_lastname)
+
+    serializer = ClientSerializer(clients, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)    
+
+@api_view(['GET'])
 def get_client_details_by_id(request, client_id):
     client = get_object_or_404(Client, id=client_id)
     serializer = ClientSerializer(client)
@@ -20,12 +27,17 @@ def get_client_details_by_id(request, client_id):
 @api_view(['POST'])
 def create_client(request):
     if request.method == 'POST':
+        email = request.data.get('email')
+        if Client.objects.filter(email=email).exists():
+            return Response(
+                {'error': 'un client avec cet email existe déjà.'}
+            )
         serializer = ClientSerializer(data=request.data)
         if serializer.is_valid():
             client = serializer.save()
             return Response(
                 {
-                    'message': 'Client créé avec succès',
+                    'message': 'Le client a  été ajouté avec succès',
                     'client': ClientSerializer(client).data 
                 },
                  status=status.HTTP_201_CREATED
@@ -41,7 +53,7 @@ def update_client(request, client_id):
         serializer.save()
         return Response(
             {
-                'message': 'Client modifié avec succès',
+                'message': 'Le client  a été modifié avec succès',
                 'client': serializer.data
             },
             status=status.HTTP_200_OK
@@ -56,7 +68,7 @@ def delete_client(request, client_id):
 
     return Response(
         {
-            'message': 'Client supprimé avec succès'
+            'message': 'Le client a été supprimé avec succès'
         },
-        status=status.HTTP_204_NO_CONTENT
+        status=status.HTTP_200_OK
     )        
